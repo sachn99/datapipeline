@@ -1,0 +1,12 @@
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+dbt
+requests
+Flask
+SQLAlchemy
+psycopg2
+dash
+plotly

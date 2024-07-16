@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: noora_health
+    database: noora
+    schema: public
+    tables:
+      - name: messages
+      - name: statuses

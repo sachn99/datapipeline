@@ -1,0 +1,34 @@
+name: 'noora_health'
+version: '1.0'
+profile: 'noora_health'
+
+# Define the directory where dbt will look for models
+model-paths: ["models"]
+
+# Define the directory where dbt will look for seeds
+seed-paths: ["seeds"]
+
+# Define the directory where dbt will look for tests
+test-paths: ["tests"]
+
+# Define the directory where dbt will look for analyses
+analysis-paths: ["analyses"]
+
+# Define the directory where dbt will look for macros
+macro-paths: ["macros"]
+
+# Define the directory where dbt will look for snapshots
+snapshot-paths: ["snapshots"]
+
+# Configure the "noora_health" project
+models:
+  noora_health:
+    raw:
+      materialized: view
+    staging:
+      materialized: view
+    marts:
+      dim_messages:
+        materialized: table
+      fact_statuses:
+        materialized: table
