@@ -60,11 +60,21 @@ This project involves building an end-to-end data pipeline to ingest raw data in
    ```bash
    python api/app.py
    ```
+   http://127.0.0.1:5000
+
+   it will open swagger where you can access all api and excute them
+  
+
 
 4. **Generate visualizations:**
 
    ```bash
    python visualisation/visualize.py
+
+
+   http://127.0.0.1:8050
+
+   where you can see visualisation wrt given time range
    ```
 
 ## Project Structure
@@ -73,7 +83,7 @@ This project involves building an end-to-end data pipeline to ingest raw data in
 datapipeline/
 │
 ├── api/                  # Contains the Flask API code
-├── dbt-env/              # Contains dbt environment setup files
+├── dbt-env/              # Contains dbt environment setup files 
 ├── logs/                 # Log files for tracking processes
 ├── noora_health/         # dbt project directory
 ├── scripts/              # Data ingestion and processing scripts
@@ -83,3 +93,7 @@ datapipeline/
 └── README.md             # Project documentation
 ```
 
+# set db cred in 
+   .dbt/profile.yml
+   script/load_data.py
+   api/api_routes.py
