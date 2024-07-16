@@ -10,3 +10,6 @@ SQLAlchemy
 psycopg2
 dash
 plotly
+Flask
+Flask-RESTful
+Flask-SQLAlchemy
