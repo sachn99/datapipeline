@@ -45,7 +45,7 @@ This project involves building an end-to-end data pipeline to ingest raw data in
 1. **Run the data ingestion scripts:**
 
    ```bash
-   python scripts/data_ingestion.py
+   python scripts/load_data.py
    ```
 
 2. **Run dbt transformations:**
