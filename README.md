@@ -69,7 +69,7 @@ This project involves building an end-to-end data pipeline to ingest raw data in
 4. **Generate visualizations:**
 
    ```bash
-   python visualisation/visualize.py
+   python visualisation/dashboard.py
 
 
    http://127.0.0.1:8050
