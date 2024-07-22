@@ -13,31 +13,45 @@ engine = create_engine('postgresql://sachin:sachin@localhost:5432/noora')
 app = dash.Dash(__name__)
 
 app.layout = html.Div(children=[
-    html.H1(children='Noora Health WhatsApp Engagement Dashboard'),
+    html.H1(children='Noora Health WhatsApp Engagement Dashboard', style={'textAlign': 'center'}),
 
-    html.Div(children='''Analysis of active and engaged users, and message status distribution.'''),
-
-    html.Div([
-        html.Label('Select Date Range for Active Users Analysis:'),
-        dcc.DatePickerRange(
-            id='active-users-date-picker',
-            start_date=datetime.datetime.now() - datetime.timedelta(days=30),
-            end_date=datetime.datetime.now(),
-            display_format='YYYY-MM-DD'
-        ),
-        dcc.Graph(id='active-users'),
-    ]),
+    html.Div(children='''Analysis of active and engaged users, and message status distribution.''', style={'textAlign': 'center', 'marginBottom': '20px'}),
 
     html.Div([
-        html.Label('Select Date Range for Engaged Users Analysis:'),
-        dcc.DatePickerRange(
-            id='engaged-users-date-picker',
-            start_date=datetime.datetime.now() - datetime.timedelta(days=30),
-            end_date=datetime.datetime.now(),
-            display_format='YYYY-MM-DD'
-        ),
-        dcc.Graph(id='engaged-users'),
-    ]),
+        html.Div([
+            html.H3('Total Active Users'),
+            html.Div(id='total-active-users', style={'fontSize': '24px', 'fontWeight': 'bold'}),
+        ], style={'width': '48%', 'display': 'inline-block', 'padding': '20px', 'textAlign': 'center', 'border': '1px solid #ddd', 'borderRadius': '10px'}),
+
+        html.Div([
+            html.H3('Total Engaged Users'),
+            html.Div(id='total-engaged-users', style={'fontSize': '24px', 'fontWeight': 'bold'}),
+        ], style={'width': '48%', 'display': 'inline-block', 'padding': '20px', 'textAlign': 'center', 'border': '1px solid #ddd', 'borderRadius': '10px'}),
+    ], style={'display': 'flex', 'justifyContent': 'space-between', 'marginBottom': '20px'}),
+
+    html.Div([
+        html.Div([
+            html.Label('Select Date Range for Active Users Analysis:'),
+            dcc.DatePickerRange(
+                id='active-users-date-picker',
+                start_date=datetime.datetime.now() - datetime.timedelta(days=30),
+                end_date=datetime.datetime.now(),
+                display_format='YYYY-MM-DD'
+            ),
+            dcc.Graph(id='active-users'),
+        ], style={'width': '48%', 'display': 'inline-block', 'padding': '20px'}),
+
+        html.Div([
+            html.Label('Select Date Range for Engaged Users Analysis:'),
+            dcc.DatePickerRange(
+                id='engaged-users-date-picker',
+                start_date=datetime.datetime.now() - datetime.timedelta(days=30),
+                end_date=datetime.datetime.now(),
+                display_format='YYYY-MM-DD'
+            ),
+            dcc.Graph(id='engaged-users'),
+        ], style={'width': '48%', 'display': 'inline-block', 'padding': '20px'}),
+    ], style={'display': 'flex', 'justifyContent': 'space-between'}),
 
     html.Div([
         html.Label('Select Date Range for Status Summary Analysis:'),
@@ -48,11 +62,11 @@ app.layout = html.Div(children=[
             display_format='YYYY-MM-DD'
         ),
         dcc.Graph(id='status-summary'),
-    ]),
+    ], style={'padding': '20px'}),
 
     html.Div([
         html.Label('Enter User ID and Select Date Range for User Messages Analysis:'),
-        dcc.Input(id='user-id-input', type='text', placeholder='Enter User ID'),
+        dcc.Input(id='user-id-input', type='text', placeholder='Enter User ID', style={'marginRight': '10px'}),
         dcc.DatePickerRange(
             id='user-messages-date-picker',
             start_date=datetime.datetime.now() - datetime.timedelta(days=30),
@@ -60,11 +74,13 @@ app.layout = html.Div(children=[
             display_format='YYYY-MM-DD'
         ),
         dcc.Graph(id='user-messages-status'),
-    ])
+    ], style={'padding': '20px'}),
 ])
 
 @app.callback(
-    [Output('active-users', 'figure'),
+    [Output('total-active-users', 'children'),
+     Output('total-engaged-users', 'children'),
+     Output('active-users', 'figure'),
      Output('engaged-users', 'figure'),
      Output('status-summary', 'figure'),
      Output('user-messages-status', 'figure')],
@@ -83,6 +99,28 @@ def update_graphs(active_start_date, active_end_date,
                   status_start_date, status_end_date,
                   user_id, user_start_date, user_end_date):
     
+    # Total Active Users Query
+    total_active_users_query = """
+    SELECT 
+        COUNT(DISTINCT masked_from_addr) AS total_active_users
+    FROM public.dim_messages
+    WHERE direction = 'inbound';
+    """
+    total_active_users_df = pd.read_sql(total_active_users_query, engine)
+    total_active_users = total_active_users_df['total_active_users'].iloc[0]
+
+    # Total Engaged Users Query
+    total_engaged_users_query = """
+    SELECT 
+        COUNT(DISTINCT masked_addressees) AS total_engaged_users
+    FROM public.dim_messages
+    WHERE last_status = 'read'
+    AND last_status_timestamp >= inserted_at 
+    AND last_status_timestamp < inserted_at + INTERVAL '7 days';
+    """
+    total_engaged_users_df = pd.read_sql(total_engaged_users_query, engine)
+    total_engaged_users = total_engaged_users_df['total_engaged_users'].iloc[0]
+
     # Active Users Query
     active_users_query = """
     SELECT 
@@ -156,7 +194,7 @@ def update_graphs(active_start_date, active_end_date,
     else:
         user_messages_fig = px.scatter(title='No User ID Provided')
 
-    return active_users_fig, engaged_users_fig, status_summary_fig, user_messages_fig
+    return total_active_users, total_engaged_users, active_users_fig, engaged_users_fig, status_summary_fig, user_messages_fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
